@@ -1,0 +1,4 @@
+influxdb3-python==0.3.1
+pandas==2.0.3
+python-miio @ git+https://github.com/rytilahti/python-miio.git
+python-dotenv==1.0.0
