@@ -2,7 +2,7 @@ from micloud import MiCloud
 from miio import DeviceFactory, DeviceInfo, Device
 from time import sleep
 import influxdb
-from influxdb_client_3 import InfluxDBClient3
+from influxdb_client import InfluxDBClient
 from dotenv import load_dotenv
 import os
 
@@ -62,7 +62,7 @@ def info(device: Device):
     print("Print device information: ") 
     print(device.info())
     
-def get_every_n_seconds(device: Device, client: InfluxDBClient3, seconds=10):
+def get_every_n_seconds(device: Device, client: InfluxDBClient, seconds=10):
     while True:
         value = get_air_quality(device)
         print(f"Quality: {value} μg/m^3")
@@ -73,7 +73,7 @@ def get_every_n_seconds(device: Device, client: InfluxDBClient3, seconds=10):
         write_to_influx(data, client)
         sleep(seconds)
 
-def write_to_influx(data:dict, client: InfluxDBClient3=influxdb.connect()):
+def write_to_influx(data:dict, client: InfluxDBClient=influxdb.connect()):
     print(f"Writing to influx db:\n{data}")
     return influxdb.write(data,client)
 
@@ -109,7 +109,7 @@ def main(args=[]):
         dev = connect()
         db_client = influxdb.connect()
         info(dev)
-        get_every_n_seconds(dev, db_client, 5)
+        get_every_n_seconds(dev, db_client, 30)
     except KeyboardInterrupt:
         db_client.close()
         print("Closing all. Chao ;P")

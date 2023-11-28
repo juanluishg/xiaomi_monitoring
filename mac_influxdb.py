@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 import time
-from influxdb_client import InfluxDBClient, Point, WriteOptions
+from influxdb_client_3 import InfluxDBClient3, Point
 
 load_dotenv()  # take environment variables from .env.
 
@@ -12,16 +12,8 @@ DATABASE = os.getenv("INFLUXDB_DATABASE")
 
 
 def connect(host=HOST, token=INFLUXDB_TOKEN, org=ORG):
-    client = InfluxDBClient(url=host, token=token, org=org)
-    write_client = client.write_api(write_options=WriteOptions(batch_size=500,
-                                                      flush_interval=10_000,
-                                                      jitter_interval=2_000,
-                                                      retry_interval=5_000,
-                                                      max_retries=5,
-                                                      max_retry_delay=30_000,
-                                                      max_close_wait=300_000,
-                                                      exponential_base=2))
-    return write_client
+    client = InfluxDBClient3(host=host, token=token, org=org)
+    return client
 
 def write(data:dict, client=connect()):
     database="sensor_data"
@@ -38,7 +30,7 @@ def write(data:dict, client=connect()):
         .field("filter_used_time", data["filter_used_time"])
         .field("filter_life_level", data["filter_life_level"])
     )
-    client.write(database, ORG, point)
+    client.write(database=database, record=point)
     time.sleep(1) # separate points by 1 second
 
     print("Complete. Return to the InfluxDB UI.")
@@ -54,11 +46,11 @@ def write_gpio(data:dict, client=connect()):
         .tag("mac", data["mac"])
         .field(data["unit"], data["value"])
     )
-    client.write(database, ORG, point)
+    client.write(database=database, record=point)
     time.sleep(1) # separate points by 1 second
 
     print("Complete. Return to the InfluxDB UI.")
     return True
 
-def close(client:InfluxDBClient):
+def close(client:InfluxDBClient3):
     client.close()

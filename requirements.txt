@@ -1,4 +1,6 @@
-influxdb3-python==0.3.1
-pandas==2.0.3
+influxdb-client[ciso]
 python-miio @ git+https://github.com/rytilahti/python-miio.git
-python-dotenv==1.0.0
+python-dotenv
+Adafruit-DHT
+getmac
+gpiozero
