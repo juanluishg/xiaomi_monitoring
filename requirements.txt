@@ -4,3 +4,4 @@ python-dotenv
 Adafruit-DHT
 getmac
 gpiozero
+serial

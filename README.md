@@ -1,5 +1,9 @@
 # Xiaomi Airpurifier 4 Compact to InfluxDB
 
+## Requirements
+
+* Python >= 3.8
+
 ## Installation
 
 ```pip install -r requirements.txt```
