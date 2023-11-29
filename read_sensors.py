@@ -8,18 +8,28 @@ from influxdb_client import InfluxDBClient
 import os
 from getmac import get_mac_address as gma
 import socket
+import pump_controller as pump
+
+LAST_PUMP_STATUS=0
 
 def get_ip_address():
     hostname = socket.gethostname()
     return socket.gethostbyname(hostname)
 
 def get_soil_moisture(channel=0, device=0, min_moisture=350.0, max_moisture=1023.0):
+    global LAST_PUMP_STATUS
     pot = MCP3008(channel=channel, device=device)
     now = datetime.now()
     print(pot.raw_value)
     moisture_value=((pot.raw_value - max_moisture)/(min_moisture-max_moisture))*100
     print("Soil moisture {}".format(moisture_value))
     print("Timestamp {}".format(now.strftime("%H:%M:%S")))
+    if(moisture_value < 20 and LAST_PUMP_STATUS == 0):
+        pump.on_off(True)
+        LAST_PUMP_STATUS=1
+    elif (moisture_value > 20):
+        pump.on_off(False)
+        LAST_PUMP_STATUS=0
     pot.close()
     return moisture_value
 
@@ -72,19 +82,15 @@ def create_json(id:str,
     }
     return res
 
-def main():
+def main(refresh_seconds=30):
     db_client = None
     try:
         db_client = influxdb.connect()
-        get_every_n_seconds(db_client, 30)
-    except KeyboardInterrupt:
+        get_every_n_seconds(db_client, refresh_seconds)
+    except Exception as e:
         db_client.close()
+        print("Read sensors: {}".format(e))
         print("Closing all. Chao ;P")
         exit(0)
-
-if __name__ == "__main__":
-    main()
-
-
 
     

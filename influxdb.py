@@ -41,7 +41,7 @@ def write(data:dict, client=connect()):
     client.write(database, ORG, point)
     time.sleep(1) # separate points by 1 second
 
-    print("Complete. Return to the InfluxDB UI.")
+    print("Complete write air quality. Return to the InfluxDB UI.")
     return True
 
 def write_gpio(data:dict, client=connect()):
@@ -57,7 +57,24 @@ def write_gpio(data:dict, client=connect()):
     client.write(database, ORG, point)
     time.sleep(1) # separate points by 1 second
 
-    print("Complete. Return to the InfluxDB UI.")
+    print("Complete write gpio. Return to the InfluxDB UI.")
+    return True
+
+def write_status(data:dict, client=connect()):
+    database="sensor_data"
+
+    point = (
+        Point(data["model"])
+        .tag("device_id", data["device_id"])
+        .tag("source", data["source"])
+        .tag("pin", data["pin"])
+        .field("status", data["status"])
+    )
+
+    client.write(database, ORG, point)
+    time.sleep(1) # separate points by 1 second
+
+    print("Complete write status. Return to the InfluxDB UI.")
     return True
 
 def close(client:InfluxDBClient):

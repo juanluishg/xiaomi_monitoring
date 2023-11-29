@@ -103,19 +103,17 @@ def create_json(id:str,
     }
     return res
 
-def main(args=[]):
+def main(refresh_seconds=30):
     db_client = None
     try:
         dev = connect()
         db_client = influxdb.connect()
         info(dev)
-        get_every_n_seconds(dev, db_client, 30)
-    except KeyboardInterrupt:
+        get_every_n_seconds(dev, db_client, refresh_seconds)
+    except Exception as e:
         db_client.close()
+        print("Air quality: {}".format(e))
         print("Closing all. Chao ;P")
         exit(0)
-
-if __name__ == '__main__':
-    main()
     
     
